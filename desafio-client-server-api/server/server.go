@@ -31,7 +31,7 @@ func main() {
 
 	// handlers
 	mux := http.NewServeMux()
-	mux.HandleFunc("/cotacao", handleCotacao)
+	mux.HandleFunc("/cotacao", logMiddleware(handleCotacao))
 
 	log.Printf("\nListen on :%s [time_to_start: %0.2f]\n", "8080", time.Since(now).Seconds())
 
@@ -124,4 +124,12 @@ func getDollarQuote(ctx context.Context) (domain.Quote, error) {
 	}
 
 	return domain.Quote{Bid: bid}, nil
+}
+
+func logMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("request %s %s", r.Method, r.URL.Path)
+
+		next.ServeHTTP(w, r)
+	}
 }
