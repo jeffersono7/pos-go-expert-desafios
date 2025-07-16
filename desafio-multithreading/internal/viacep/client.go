@@ -1,4 +1,4 @@
-package brasilapi
+package viacep
 
 import (
 	"context"
@@ -14,24 +14,37 @@ const url = "http://viacep.com.br/ws"
 type ViaCepAPIClient struct {
 }
 
-func (b ViaCepAPIClient) GetCEP(ctx context.Context, cep string) (*client.CepResponse, error) {
+func (b ViaCepAPIClient) GetCEP(ctx context.Context, cep string, channelResp chan<- client.CepResponse) {
 	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/%s/json/", url, cep), nil)
 	if err != nil {
-		return nil, fmt.Errorf("fail new req: %w", err)
+		// fmt.Printf("fail new req: %v\n", err)
+		close(channelResp)
+		return
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("fail do request: %w", err)
+		// fmt.Printf("fail do request: %v\n", err)
+		close(channelResp)
+		return
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= 400 {
+		// fmt.Printf("api returned error: %v\n", resp.Status)
+		close(channelResp)
+		return
+	}
+
 	var cepResp client.CepResponse
 	if err = json.NewDecoder(resp.Body).Decode(&cepResp); err != nil {
-		return nil, fmt.Errorf("fail unmarshal resp: %w", err)
+		// fmt.Printf("fail unmarshal resp: %v\n", err)
+		close(channelResp)
+		return
 	}
 
 	cepResp.Api = "viacep"
 
-	return &cepResp, nil
+	channelResp <- cepResp
+	close(channelResp)
 }

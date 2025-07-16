@@ -11,5 +11,5 @@ type CepResponse struct {
 }
 
 type CepAPI interface {
-	GetCEP(ctx context.Context, cep string) (CepResponse, error)
+	GetCEP(ctx context.Context, cep string, channelResponse chan<- CepResponse)
 }
