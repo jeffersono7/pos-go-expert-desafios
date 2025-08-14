@@ -3,11 +3,12 @@ package service
 import "github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/domain"
 
 type WeatherService struct {
-	cepService CepService
+	cepClient     CepClient
+	weatherClient WeatherClient
 }
 
-func NewWeatherService(cepService CepService) *WeatherService {
-	return &WeatherService{cepService: cepService}
+func NewWeatherService(cepClient CepClient, weatherClient WeatherClient) *WeatherService {
+	return &WeatherService{cepClient: cepClient, weatherClient: weatherClient}
 }
 
 func GetWeatherFromCEP(cep string) (domain.Weather, error) {

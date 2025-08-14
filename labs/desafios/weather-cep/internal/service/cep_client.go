@@ -2,11 +2,11 @@ package service
 
 import "context"
 
-type Cep struct {
+type CepResp struct {
 	Localidade string `json:"localidade"`
 	UF         string `json:"uf"`
 }
 
-type CepService interface {
-	GetCEP(ctx context.Context, cep string) (Cep, error)
+type CepClient interface {
+	GetCEP(ctx context.Context, cep string) (CepResp, error)
 }
