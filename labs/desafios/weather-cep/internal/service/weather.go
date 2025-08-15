@@ -1,16 +1,20 @@
 package service
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"log"
 	"regexp"
 
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/domain"
 )
 
 var (
-	ErrInvalidCEP  = errors.New("invalid zipcode")
-	ErrNotFoundCEP = errors.New("can not find zipcode")
-	cepRegex       *regexp.Regexp
+	ErrInvalidCEP     = errors.New("invalid zipcode")
+	ErrNotFoundCEP    = errors.New("can not find zipcode")
+	ErrFailGetWeather = errors.New("fail get weather")
+	cepRegex          *regexp.Regexp
 )
 
 type WeatherService struct {
@@ -30,10 +34,22 @@ func NewWeatherService(cepClient CepClient, weatherClient WeatherClient) *Weathe
 	return &WeatherService{cepClient: cepClient, weatherClient: weatherClient}
 }
 
-func (ws *WeatherService) GetWeatherFromCEP(cep string) (domain.Weather, error) {
+func (ws *WeatherService) GetWeatherFromCEP(ctx context.Context, cep string) (domain.Weather, error) {
 	if !cepRegex.MatchString(cep) {
 		return domain.Weather{}, ErrInvalidCEP
 	}
 
-	return domain.Weather{}, nil
+	cepResp, err := ws.cepClient.GetCEP(ctx, cep)
+	if err != nil {
+		log.Println(err)
+		return domain.Weather{}, ErrNotFoundCEP
+	}
+
+	weatherResp, err := ws.weatherClient.GetTemp(fmt.Sprintf("%s %s", cepResp.Localidade, cepResp.Estado))
+	if err != nil {
+		log.Println(err)
+		return domain.Weather{}, ErrFailGetWeather
+	}
+
+	return domain.NewWeather(weatherResp.Current.TempC), nil
 }

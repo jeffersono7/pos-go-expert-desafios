@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/domain"
@@ -29,9 +30,10 @@ func TestGetWeatherFromCEP(t *testing.T) {
 
 	for _, cc := range suite {
 		t.Run(cc.description, func(t *testing.T) {
+			ctx := context.Background()
 			subject := NewWeatherService(nil, nil)
 
-			actual, err := subject.GetWeatherFromCEP(cc.input)
+			actual, err := subject.GetWeatherFromCEP(ctx, cc.input)
 
 			if cc.expectedErr != nil {
 				assert.Equal(t, cc.expectedErr, err)
