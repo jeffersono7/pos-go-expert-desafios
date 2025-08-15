@@ -9,14 +9,14 @@ import (
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/service"
 )
 
-type CepServiceImpl struct {
+type CepClientImpl struct {
 }
 
-func NewCepServiceImpl() *CepServiceImpl {
-	return &CepServiceImpl{}
+func NewCepServiceImpl() *CepClientImpl {
+	return &CepClientImpl{}
 }
 
-func (cs CepServiceImpl) GetCEP(ctx context.Context, cep string) (service.CepResp, error) {
+func (cs CepClientImpl) GetCEP(ctx context.Context, cep string) (service.CepResp, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://viacep.com.br/ws/%s/json/", cep), nil)
 	if err != nil {
 		return service.CepResp{}, fmt.Errorf("fail make req: %w", err)
