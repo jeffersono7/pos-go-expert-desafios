@@ -44,6 +44,8 @@ func TestGetWeatherFromCEP(t *testing.T) {
 
 	for _, cc := range suite {
 		t.Run(cc.description, func(t *testing.T) {
+			t.Parallel()
+
 			ctx := context.Background()
 
 			cepClientMock := new(mocks.CepClientMock)
@@ -58,6 +60,7 @@ func TestGetWeatherFromCEP(t *testing.T) {
 				assert.Equal(t, cc.expectedErr, err)
 			}
 			assert.Equal(t, cc.expectedResult, actual)
+			cepClientMock.AssertExpectations(t)
 		})
 	}
 }
