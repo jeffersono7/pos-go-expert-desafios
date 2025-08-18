@@ -1,5 +1,7 @@
 package service
 
+import "context"
+
 type WeatherResp struct {
 	Current struct {
 		TempC float32 `json:"temp_c"`
@@ -7,5 +9,5 @@ type WeatherResp struct {
 }
 
 type WeatherClient interface {
-	GetTemp(neighborhood string) (WeatherResp, error)
+	GetTemp(ctx context.Context, neighborhood string) (WeatherResp, error)
 }
