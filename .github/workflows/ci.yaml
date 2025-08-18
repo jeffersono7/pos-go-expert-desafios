@@ -12,6 +12,9 @@ jobs:
     outputs:
       labs_desafios_weather_cep: ${{ steps.filter.outputs.labs_desafios_weather_cep }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
       - uses: dorny/paths-filter@v2
         id: filter
         with:
