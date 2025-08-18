@@ -45,7 +45,7 @@ func (ws *WeatherService) GetWeatherFromCEP(ctx context.Context, cep string) (do
 		return domain.Weather{}, ErrNotFoundCEP
 	}
 
-	weatherResp, err := ws.weatherClient.GetTemp(fmt.Sprintf("%s %s", cepResp.Localidade, cepResp.Estado))
+	weatherResp, err := ws.weatherClient.GetTemp(ctx, fmt.Sprintf("%s %s", cepResp.Localidade, cepResp.Estado))
 	if err != nil {
 		log.Println(err)
 		return domain.Weather{}, ErrFailGetWeather
