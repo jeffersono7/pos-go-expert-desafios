@@ -17,7 +17,7 @@ jobs:
         with:
           filters: |
             labs_desafios_weather_cep:
-              - labs/desafios/weather-cep/**
+              - 'labs/desafios/weather-cep/**'
 
   test-labs_desafios_weather_cep:
     needs: changes
