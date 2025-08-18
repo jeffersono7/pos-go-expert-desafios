@@ -1,0 +1,31 @@
+name: Pos go expert CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      labs_desafios_weather_cep: ${{ steps.filter.outputs.labs_desafios_weather_cep }}
+    steps:
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            labs_desafios_weather_cep:
+              - labs/desafios/weather-cep/**
+
+test-labs_desafios_weather_cep:
+  needs: changes
+  if: needs.changes.outputs.labs_desafios_weather_cep == 'true'
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v4
+      with:
+        go-version: "1.23"
+    - run: cd labs/desafios/weather-cep && go test ./...
