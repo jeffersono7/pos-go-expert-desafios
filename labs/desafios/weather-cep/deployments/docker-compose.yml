@@ -1,0 +1,17 @@
+services:
+  weather:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    container_name: weather
+    restart: always
+    ports:
+      - '8080:8080'
+    networks:
+      - weather_net
+    environment:
+      WEATHER_API_KEY: TEST
+
+networks:
+  weather_net:
+    driver: bridge
