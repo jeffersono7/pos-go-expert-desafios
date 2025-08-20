@@ -32,7 +32,7 @@ func (wc *WeatherClientImpl) GetTemp(ctx context.Context, neighborhood string) (
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return service.WeatherResp{}, fmt.Errorf("unsuccess status response: %s", resp.Status)
+		return service.WeatherResp{}, fmt.Errorf("request returns an error with status: %s", resp.Status)
 	}
 
 	var weatherResp service.WeatherResp
