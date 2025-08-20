@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/config"
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/service"
@@ -18,6 +19,7 @@ func NewWeatherClientImpl() *WeatherClientImpl {
 }
 
 func (wc *WeatherClientImpl) GetTemp(ctx context.Context, neighborhood string) (service.WeatherResp, error) {
+	neighborhood = url.QueryEscape(neighborhood)
 	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?q=%s&key=%s", neighborhood, config.ApiKey)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -32,6 +34,7 @@ func (wc *WeatherClientImpl) GetTemp(ctx context.Context, neighborhood string) (
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		fmt.Println(req)
 		return service.WeatherResp{}, fmt.Errorf("request returns an error with status: %s", resp.Status)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/weather-cep/internal/controller/dto"
@@ -21,6 +22,8 @@ func NewWeatherController(weatherService *service.WeatherService) *WeatherContro
 func (wc *WeatherController) GetWeather(w http.ResponseWriter, r *http.Request) {
 	cepParam := chi.URLParam(r, "cep")
 	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, time.Second*3)
+	defer cancel()
 
 	weather, err := wc.weatherService.GetWeatherFromCEP(ctx, cepParam)
 	if err != nil {
