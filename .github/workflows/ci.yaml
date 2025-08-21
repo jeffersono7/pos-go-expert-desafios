@@ -90,8 +90,10 @@ jobs:
       
       - name: deploy to cloud run
         run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
           gcloud run deploy $SERVICE_NAME \
             --image ${{ needs.build-labs_desafios_weather_cep.outputs.image_url }} \
             --region $GCP_REGION \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars "ENV=prd,VERSION=$SHORT_SHA,WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}"
