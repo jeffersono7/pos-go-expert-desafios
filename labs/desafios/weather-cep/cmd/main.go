@@ -31,6 +31,6 @@ func main() {
 
 	r.Get("/cep/{cep}/weather", wc.GetWeather)
 
-	log.Println("Weather listen on :8080")
+	log.Println("Weather -> listen on :8080")
 	http.ListenAndServe(net.JoinHostPort("", "8080"), r)
 }
