@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  GCP_PROJECT: pos-go-expert-jeff
+  GCP_REGION: us-east1
+  AR_REPOSITORY: weather-cep
+  IMAGE_NAME: weather
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -32,3 +38,32 @@ jobs:
         with:
           go-version: "1.23"
       - run: cd labs/desafios/weather-cep && go test ./...
+  build-labs_desafios_weather_cep:
+    needs: test-labs_desafios_weather_cep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: authenticate to google cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: set up google cloud sdk
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: configure docker to artifact registry
+        run: |
+          gcloud auth configure-docker $GCP_REGION-docker.pkg.dev
+
+      - name: build docker image
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          cd labs/desafios/weather-cep
+          docker build -f build/Dockerfile -t $GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPOSITORY/$IMAGE_NAME:${SHORT_SHA} .
+
+      - name: push docker image
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          echo "Pushing image with tag: $SHORT_SHA"
+          docker push $GCP_PROJECT-docker.pkg.dev/$GCP_PROJECT/$AR_REPOSITORY/$IMAGE_NAME:${SHORT_SHA}
