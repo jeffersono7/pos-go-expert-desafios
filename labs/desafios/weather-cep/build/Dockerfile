@@ -15,4 +15,4 @@ WORKDIR /app
 COPY --from=build /build/weather /app/
 
 EXPOSE 8080
-ENTRYPOINT ["/app/weather"]
+ENTRYPOINT ["./weather"]
