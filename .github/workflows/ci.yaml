@@ -86,8 +86,8 @@ jobs:
       
       - name: deploy to cloud run
         run: |
-          gcloud run deploy ${{ needs.build-labs_desafios_weather_cep.outputs.image_url }} \
-            --image ${{ env.IMAGE_URL }} \
+          gcloud run deploy $SERVICE_NAME \
+            --image ${{ needs.build-labs_desafios_weather_cep.outputs.image_url }} \
             --region $GCP_REGION \
             --platform managed \
             --allow-unauthenticated
