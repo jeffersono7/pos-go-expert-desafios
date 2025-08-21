@@ -72,7 +72,7 @@ jobs:
           docker push $TAG
           echo "IMAGE_URL=$TAG" >> $GITHUB_ENV
   deploy-labs_desafios_weather_cep:
-    runs-on: ubuntu/latest
+    runs-on: ubuntu-latest
     needs: build-labs_desafios_weather_cep
     steps:
       - name: authenticate to google cloud
