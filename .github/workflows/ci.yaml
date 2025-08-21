@@ -11,6 +11,7 @@ env:
   GCP_REGION: us-east1
   AR_REPOSITORY: weather-cep
   IMAGE_NAME: weather
+  SERVICE_NAME: weather
 
 jobs:
   changes:
@@ -65,5 +66,26 @@ jobs:
       - name: push docker image
         run: |
           SHORT_SHA="${GITHUB_SHA:0:7}"
+          TAG="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPOSITORY/$IMAGE_NAME:${SHORT_SHA}"
+
           echo "Pushing image with tag: $SHORT_SHA"
-          docker push $GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPOSITORY/$IMAGE_NAME:${SHORT_SHA}
+          docker push $TAG
+          echo "IMAGE_URL=$TAG" >> $GITHUB_ENV
+  deploy-labs_desafios_weather_cep:
+    runs-on: ubuntu/latest
+    needs: build-labs_desafios_weather_cep
+    steps:
+      - name: authenticate to google cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: set up gcloud sdk
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: deploy to cloud run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image ${{ env.IMAGE_URL }} \
+            --region $GCP_REGION \
+            --platform managed \
+            --allow-unauthenticated
