@@ -43,6 +43,8 @@ jobs:
   build-labs_desafios_weather_cep:
     needs: test-labs_desafios_weather_cep
     runs-on: ubuntu-latest
+    outputs:
+      image_url: ${{ steps.push_docker_image.outputs.image_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -65,6 +67,7 @@ jobs:
           docker build -f build/Dockerfile -t $GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPOSITORY/$IMAGE_NAME:${SHORT_SHA} .
 
       - name: push docker image
+        id: push_docker_image
         run: |
           SHORT_SHA="${GITHUB_SHA:0:7}"
           TAG="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT/$AR_REPOSITORY/$IMAGE_NAME:${SHORT_SHA}"
@@ -72,6 +75,7 @@ jobs:
           echo "Pushing image with tag: $SHORT_SHA"
           docker push $TAG
           echo "image_url=$TAG" >> $GITHUB_OUTPUT
+          echo "Output image_url: $TAG"
 
   deploy-labs_desafios_weather_cep:
     runs-on: ubuntu-latest

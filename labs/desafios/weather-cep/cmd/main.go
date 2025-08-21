@@ -33,5 +33,5 @@ func main() {
 
 	log.Println("Weather -> listen on :8080")
 	http.ListenAndServe(net.JoinHostPort("", "8080"), r)
-	log.Println("shutdown!!!")
+	log.Println("shutdown...")
 }
