@@ -6,9 +6,9 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . ./
 
-RUN GOOS=linux GOARCH=amd64 go build -o weather cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o weather cmd/main.go
 
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /app
 
