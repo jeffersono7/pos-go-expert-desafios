@@ -11,18 +11,35 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/otel/service_a/config"
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/otel/service_a/internal/handler"
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/otel/service_a/internal/service"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
-	r := mux.NewRouter()
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
+	// otel
+	otelShutdown, err := config.SetupOTelSDK(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer func() {
+		err = otelShutdown(context.Background())
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}()
+	// end
+
+	httpHandler, handleFunc := newOtelHTTPHandler()
 	server := http.Server{
-		Addr:    ":8080",
-		Handler: r,
+		Addr:         ":8080",
+		ReadTimeout:  time.Second,
+		WriteTimeout: 10 * time.Second,
+		Handler:      httpHandler,
 	}
 
 	go func() {
@@ -38,14 +55,10 @@ func main() {
 
 	weatherController := handler.WeatherHandler{Service: weatherService}
 
-	r.HandleFunc("/weather", weatherController.GetWeather).Methods("POST")
+	handleFunc("/weather", weatherController.GetWeather, "POST")
 	// end
-	//
-	//
-	//
 
 	log.Println("server listen...")
-
 	<-sig
 	ctx, shutdownRelease := context.WithTimeout(context.Background(), time.Second)
 	defer shutdownRelease()
@@ -56,4 +69,17 @@ func main() {
 	}
 
 	log.Println("graceful shutdown complete.")
+}
+
+func newOtelHTTPHandler() (http.Handler, func(string, func(http.ResponseWriter, *http.Request), ...string)) {
+	r := mux.NewRouter()
+
+	handleFunc := func(pattern string, handlerFunc func(http.ResponseWriter, *http.Request), methods ...string) {
+		handler := otelhttp.WithRouteTag(pattern, http.HandlerFunc(handlerFunc))
+		r.Handle(pattern, handler).Methods(methods...)
+	}
+
+	handler := otelhttp.NewHandler(r, "/")
+
+	return handler, handleFunc
 }

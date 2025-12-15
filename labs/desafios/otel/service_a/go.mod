@@ -7,6 +7,7 @@ toolchain go1.24.11
 require (
 	github.com/go-playground/validator/v10 v10.29.0
 	github.com/gorilla/mux v1.8.1
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.64.0
 	go.opentelemetry.io/otel v1.39.0
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.15.0
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.39.0
@@ -19,6 +20,7 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
