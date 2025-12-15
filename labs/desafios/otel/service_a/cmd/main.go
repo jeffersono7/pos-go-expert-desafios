@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/otel/service_a/internal/handler"
+	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/otel/service_a/internal/service"
 )
 
 func main() {
@@ -31,10 +32,17 @@ func main() {
 	}()
 
 	// boot
-	weatherController := handler.WeatherHandler{}
+	httpClient := http.Client{}
+
+	weatherService := service.WeatherService{Client: httpClient}
+
+	weatherController := handler.WeatherHandler{Service: weatherService}
 
 	r.HandleFunc("/weather", weatherController.GetWeather).Methods("POST")
 	// end
+	//
+	//
+	//
 
 	log.Println("server listen...")
 
