@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  service_a:
+    container_name: service_a
+    build:
+      context: service_a
+      dockerfile: Dockerfile
+      no_cache: true
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: service.name=service_a
+      PORT: 8080
+  service_b:
+    container_name: service_b
+    build:
+      context: service_b
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: service.name=service_b
+      PORT: 8081
