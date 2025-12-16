@@ -30,7 +30,7 @@ func SetupOTelSDK(ctx context.Context) (func(context.Context) error, error) {
 	}
 
 	handleErr := func(inErr error) {
-		err = errors.Join(err, shutdown(ctx))
+		err = errors.Join(inErr, shutdown(ctx))
 	}
 
 	prop := newPropagator()
