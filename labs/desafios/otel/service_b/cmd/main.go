@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,16 @@ import (
 	"github.com/jeffersono7/pos-go-expert-desafios/labs/desafios/otel/service_b/internal/service"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
+
+var port = "8080"
+
+func init() {
+	portEnv := os.Getenv("PORT")
+	if portEnv == "" {
+		return
+	}
+	port = portEnv
+}
 
 func main() {
 	sig := make(chan os.Signal, 1)
@@ -36,7 +47,7 @@ func main() {
 
 	httpHandler, handleFunc := newOtelHTTPHandler()
 	server := http.Server{
-		Addr:         ":8080",
+		Addr:         fmt.Sprintf(":%s", port),
 		ReadTimeout:  time.Second,
 		WriteTimeout: 10 * time.Second,
 		Handler:      httpHandler,
@@ -58,7 +69,7 @@ func main() {
 	handleFunc("/weather", weatherController.GetWeather, "POST")
 	// end
 
-	log.Println("server listen...")
+	log.Printf("server listen on :%s", port)
 	<-sig
 	ctx, shutdownRelease := context.WithTimeout(context.Background(), time.Second)
 	defer shutdownRelease()
@@ -68,7 +79,7 @@ func main() {
 		return
 	}
 
-	log.Println("graceful shutdown complete.")
+	defer log.Println("graceful shutdown complete.")
 }
 
 func newOtelHTTPHandler() (http.Handler, func(string, func(http.ResponseWriter, *http.Request), ...string)) {
